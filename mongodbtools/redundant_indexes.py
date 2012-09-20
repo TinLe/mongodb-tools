@@ -7,9 +7,44 @@ with just fields {field1:1}, the latter index is not needed since the first inde
 indexes the necessary fields.
 """
 from pymongo import Connection
+from pymongo import ReadPreference
+from argparse import ArgumentParser
+
+MongoHost = 'localhost'
+MongoPort = 27017
+MongoUser = None
+MongoPassword = None
 
 def main():
-    connection = Connection()
+    global MongoHost, MongoPort, MongoUser, MongoPassword
+
+    usage = 'Usage: %prog [options]'
+    description = 'Print out potentially redundant indexes in a MongoDB instance.'
+
+    global options
+    parser = ArgumentParser(description=description)
+    parser.add_argument('-H', '--host',
+      help="mongodb host, e.g. 'api.foo.com' default to 'localhost' if not specified")
+    parser.add_argument('-P', '--port', type=int, default=27017, 
+      help="mongodb port if not the default 27017")
+    parser.add_argument('-p', '--password',
+      help="the account password")
+    parser.add_argument('-u', '--username',
+      help="user account to use with MongoDB")
+    args = parser.parse_args()
+
+    if (args.host is None
+        and args.port is None):
+      parser.print_help()
+      return
+
+    if (args.host is not None):
+        MongoHost = args.host
+    if (args.port is not None):
+        MongoPort = args.port
+    connection = Connection(host=MongoHost,
+            port=MongoPort,
+            read_preference=ReadPreference.SECONDARY)
 
     def compute_signature(index):
         signature = index["ns"]

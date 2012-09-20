@@ -9,8 +9,13 @@ from prettytable import PrettyTable
 import psutil
 from pymongo import Connection
 from pymongo import ReadPreference
+from argparse import ArgumentParser
+import os
 
-connection = Connection(read_preference=ReadPreference.SECONDARY)
+MongoHost = 'localhost'
+MongoPort = 27017
+MongoUser = None
+MongoPassword = None
 
 def compute_signature(index):
     signature = index["ns"]
@@ -42,6 +47,36 @@ def convert_bytes(bytes):
     return size
 
 def main():
+    global MongoHost, MongoPort, MongoUser, MongoPassword
+
+    usage = 'Usage: %prog [options]'
+    description = 'Generate size statistics for all collections in all DBs in MongoDB'
+
+    global options
+    parser = ArgumentParser(description=description)
+    parser.add_argument('-H', '--host',
+      help="mongodb host, e.g. 'api.foo.com' default to 'localhost' if not specified")
+    parser.add_argument('-P', '--port', type=int, default=27017, 
+      help="mongodb port if not the default 27017")
+    parser.add_argument('-p', '--password',
+      help="the account password")
+    parser.add_argument('-u', '--username',
+      help="user account to use with MongoDB")
+    args = parser.parse_args()
+
+    if (args.host is None
+        and args.port is None):
+      parser.print_help()
+      return
+
+    if (args.host is not None):
+        MongoHost = args.host
+    if (args.port is not None):
+        MongoPort = args.port
+    connection = Connection(host=MongoHost,
+            port=MongoPort,
+            read_preference=ReadPreference.SECONDARY)
+
     summary_stats = {
         "count" : 0,
         "size" : 0,
@@ -66,14 +101,15 @@ def main():
             summary_stats["size"] += stats["size"]
             summary_stats["indexSize"] += stats.get("totalIndexSize", 0)
 
-    x = PrettyTable(["Collection", "Count", "% Size", "DB Size", "Avg Obj Size", "Indexes", "Index Size"])
-    x.set_field_align("Collection", "l")
-    x.set_field_align("% Size", "r")
-    x.set_field_align("Count", "r")
-    x.set_field_align("DB Size", "r")
-    x.set_field_align("Avg Obj Size", "r")
-    x.set_field_align("Index Size", "r")
-    x.set_padding_width(1)
+    x = PrettyTable()
+    x._set_field_names(["Collection", "Count", "% Size", "DB Size", "Avg Obj Size", "Indexes", "Index Size"])
+    x.align["Collection"] = "l"
+    x.align["% Size"] = "r"
+    x.align["Count"] = "r"
+    x.align["DB Size"] = "r"
+    x.align["Avg Obj Size"] = "r"
+    x.align["Index Size"] = "r"
+    x._set_padding_width(1)
 
     print
 
@@ -89,7 +125,8 @@ def main():
                        convert_bytes(stat.get("totalIndexSize", 0))])
 
     print
-    x.printt(sortby="% Size")
+    x.sortby = "% Size"
+    print(x)
     print "Total Documents:", summary_stats["count"]
     print "Total Data Size:", convert_bytes(summary_stats["size"])
     print "Total Index Size:", convert_bytes(summary_stats["indexSize"])
