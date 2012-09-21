@@ -1,15 +1,16 @@
 ### mongodb-tools - Utilities for working MongoDB
 
+Original by jwilder.  This version modified/maintained by Tin Le.
+
 * collection-stats.py - Display statistics about the collections in all databases
 * index-stats.py - Displays statistics about the indexes in all databases
 * redudant-indexes.py - Finds indexes that may redundant
 
 ## Installation
 
-    git clone https://github.com/jwilder/mongodb-tools
+    git clone https://github.com/tinle/mongodb-tools
     cd mongodb-tools
     ./setup.sh
-    source virtualenv/bin/activate
 
 ## Test Data Setup
 
