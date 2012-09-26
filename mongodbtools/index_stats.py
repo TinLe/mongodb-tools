@@ -44,18 +44,13 @@ def convert_bytes(bytes):
 def main():
     description = 'Generate index statistics for all collections in all DBs in HOST MongoDB'
 
-    global options
+    global args
     parser = ArgumentParser(description=description)
     parser.add_argument('-H', '--host', default='localhost',
       help="mongodb host, e.g. 'api.foo.com' default to 'localhost' if not specified")
     parser.add_argument('-P', '--port', type=int, default=27017, 
       help="mongodb port if not the default 27017")
     args = parser.parse_args()
-
-    if (args.host is None
-        and args.port is None):
-      parser.print_help()
-      return
 
     connection = Connection(host=args.host,
             port=args.port,

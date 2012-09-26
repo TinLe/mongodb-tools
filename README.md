@@ -1,6 +1,6 @@
 ### mongodb-tools - Utilities for working MongoDB
 
-Original by jwilder.  This version modified/maintained by Tin Le.
+Original by Jason Wilder.  This version modified/maintained by Tin Le.
 
 * collection-stats.py - Display statistics about the collections in all databases
 * index-stats.py - Displays statistics about the indexes in all databases
@@ -14,7 +14,7 @@ Original by jwilder.  This version modified/maintained by Tin Le.
 
 ## Test Data Setup
 
-    In on terminal run:
+    In one terminal run:
 
     $ ./run-mongo.sh
 

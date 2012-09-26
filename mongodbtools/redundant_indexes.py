@@ -13,7 +13,7 @@ from argparse import ArgumentParser
 def main():
     description = 'Print out potentially redundant indexes in a MongoDB instance.'
 
-    global options
+    global args
     parser = ArgumentParser(description=description)
     parser.add_argument('-H', '--host', default='localhost',
       help="mongodb host, e.g. 'api.foo.com' default to 'localhost' if not specified")
